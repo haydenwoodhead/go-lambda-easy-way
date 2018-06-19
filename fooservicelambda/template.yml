@@ -1,0 +1,35 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Fooservice stack.
+
+Resources:
+  Fooservice:
+    Type: AWS::Serverless::Function
+    Properties:
+      Runtime: go1.x
+      Handler: main
+      CodeUri: ./main.zip
+      MemorySize: 512
+      Timeout: 30
+      Environment:
+        Variables:
+          LAMBDA: 'true'
+      Events:
+        Root:
+          Type: Api
+          Properties:
+            Path: /
+            Method: ANY
+        Proxy:
+          Type: Api
+          Properties:
+            Path: /{proxy+}
+            Method: ANY
+        Warm:
+          Type: Schedule
+          Properties:
+            Schedule: rate(15 minutes)
+
+Outputs:
+    ApiURL:
+      Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/"
